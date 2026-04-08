@@ -1,0 +1,78 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "forge-api"
+version = "0.0.1"
+description = "Forge AI Workflow Studio — Backend API"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi[standard]>=0.115.6",
+    "uvicorn[standard]>=0.34.0",
+    "pydantic>=2.10.5",
+    "pydantic-settings>=2.7.0",
+    "python-jose[cryptography]>=3.3.0",
+    "email-validator>=2.2.0",
+    "httpx>=0.28.1",
+    "networkx>=3.4.2",
+    "redis[hiredis]>=5.2.1",
+    "supabase>=2.11.0",
+    "asyncpg>=0.30.0",
+    "python-dotenv>=1.0.1",
+    "structlog>=24.4.0",
+    # Epic 4 — Execution Engine
+    "litellm>=1.50",
+    "cryptography>=42.0",
+    "simpleeval>=0.9",
+    # Epic 6 — Deployment
+    "prometheus-client>=0.21",
+    # Epic 7 — Marketplace & Billing
+    "google-api-python-client>=2.100.0",
+    "google-auth>=2.25.0",
+    "stripe>=11.0",
+    # Epic 8 — Monitoring
+    "sentry-sdk[fastapi]>=2.20",
+    # Report generation
+    "reportlab>=4.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.4",
+    "pytest-asyncio>=0.25.2",
+    "pytest-cov>=6.0.0",
+    "ruff>=0.9.2",
+    "mypy>=1.14.1",
+    "types-python-jose>=3.3.4",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "S"]
+ignore = ["E501", "S101", "B008"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S", "N"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+ignore_missing_imports = true
+plugins = ["pydantic.mypy"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "--cov=app --cov-report=term-missing --cov-report=xml"
+
+[tool.coverage.run]
+source = ["app"]
+omit = ["tests/*", "*/__init__.py"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]

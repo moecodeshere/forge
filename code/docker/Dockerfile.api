@@ -1,0 +1,61 @@
+# ============================================================
+# Forge API — Multi-stage Dockerfile
+# Base image: python:3.12-slim
+# ============================================================
+
+# ------ Stage 1: dependency resolver ------
+FROM python:3.12-slim AS deps
+
+WORKDIR /app
+
+RUN pip install --no-cache-dir uv==0.5.26
+
+COPY apps/api/pyproject.toml apps/api/.python-version ./
+
+# Install production dependencies only into /app/.venv
+RUN uv venv .venv && \
+    uv pip install --no-cache --python .venv/bin/python \
+    fastapi[standard] uvicorn[standard] pydantic pydantic-settings \
+    python-jose[cryptography] httpx "redis[hiredis]" supabase \
+    python-dotenv structlog
+
+
+# ------ Stage 2: production image ------
+FROM python:3.12-slim AS production
+
+WORKDIR /app
+
+# Non-root user for security
+RUN addgroup --system --gid 1001 forge && \
+    adduser --system --uid 1001 --gid 1001 forge
+
+COPY --from=deps /app/.venv .venv
+COPY apps/api/app ./app
+
+ENV PATH="/app/.venv/bin:$PATH" \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+USER forge
+
+EXPOSE 8000
+
+HEALTHCHECK --interval=10s --timeout=5s --start-period=30s --retries=3 \
+    CMD python -c "import httpx; httpx.get('http://localhost:8000/healthz').raise_for_status()"
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]
+
+
+# ------ Stage 3: dev image (with dev deps + hot-reload) ------
+FROM production AS dev
+
+USER root
+
+COPY --from=deps /app/.venv .venv
+
+RUN uv pip install --no-cache --python .venv/bin/python \
+    pytest pytest-asyncio pytest-cov ruff mypy
+
+USER forge
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
