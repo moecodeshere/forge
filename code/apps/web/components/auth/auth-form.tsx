@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -54,7 +54,6 @@ function AuthFormInner({ mode }: AuthFormProps) {
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next") ?? "/dashboard";
   const resetSuccess = searchParams.get("reset") === "success";
-  const supabase = useMemo(() => getBrowserSupabaseClient(), []);
   const content = authConfig[mode];
 
   const form = useForm<LoginValues>({
@@ -67,8 +66,9 @@ function AuthFormInner({ mode }: AuthFormProps) {
     setSuccessMessage(null);
     setIsSubmitting(true);
 
+    const client = getBrowserSupabaseClient();
     if (mode === "login") {
-      const { error: signInError } = await supabase.auth.signInWithPassword(values);
+      const { error: signInError } = await client.auth.signInWithPassword(values);
       setIsSubmitting(false);
 
       if (signInError) {
@@ -84,7 +84,7 @@ function AuthFormInner({ mode }: AuthFormProps) {
       typeof window !== "undefined"
         ? `${window.location.origin}/login`
         : undefined;
-    const { error: signUpError } = await supabase.auth.signUp({
+    const { error: signUpError } = await client.auth.signUp({
       email: values.email,
       password: values.password,
       options: {
@@ -108,7 +108,7 @@ function AuthFormInner({ mode }: AuthFormProps) {
     const redirectTo =
       typeof window !== "undefined" ? `${window.location.origin}/dashboard` : undefined;
 
-    const { error: oauthError } = await supabase.auth.signInWithOAuth({
+    const { error: oauthError } = await getBrowserSupabaseClient().auth.signInWithOAuth({
       provider: "github",
       options: { redirectTo },
     });

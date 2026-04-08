@@ -22,7 +22,6 @@ export default function ForgotPasswordPage() {
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const supabase = getBrowserSupabaseClient();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -32,6 +31,7 @@ export default function ForgotPasswordPage() {
   async function onSubmit(values: FormValues) {
     setError(null);
     setIsSubmitting(true);
+    const supabase = getBrowserSupabaseClient();
     const redirectTo =
       typeof window !== "undefined"
         ? `${window.location.origin}/login?reset=success`
