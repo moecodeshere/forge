@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type PresencePayload = {
   connectionId: number;
@@ -35,19 +35,22 @@ export function useCollaboration(roomId: string) {
   const channelRef = useRef<BroadcastChannel | null>(null);
   const [remoteUsers, setRemoteUsers] = useState<RemotePresence[]>([]);
 
-  const publish = (payload: Omit<PresencePayload, "connectionId" | "userName" | "userColor" | "ts">) => {
-    const channel = channelRef.current;
-    if (!channel) return;
-    const event: PresencePayload = {
-      connectionId: self.connectionId,
-      userName: self.userName,
-      userColor: self.userColor,
-      cursor: payload.cursor,
-      selectedNodeId: payload.selectedNodeId,
-      ts: Date.now(),
-    };
-    channel.postMessage(event);
-  };
+  const publish = useCallback(
+    (payload: Omit<PresencePayload, "connectionId" | "userName" | "userColor" | "ts">) => {
+      const channel = channelRef.current;
+      if (!channel) return;
+      const event: PresencePayload = {
+        connectionId: self.connectionId,
+        userName: self.userName,
+        userColor: self.userColor,
+        cursor: payload.cursor,
+        selectedNodeId: payload.selectedNodeId,
+        ts: Date.now(),
+      };
+      channel.postMessage(event);
+    },
+    [self.connectionId, self.userColor, self.userName],
+  );
 
   useEffect(() => {
     if (!roomId || roomId === "new") return;
@@ -88,7 +91,7 @@ export function useCollaboration(roomId: string) {
       channelRef.current = null;
       setRemoteUsers([]);
     };
-  }, [roomId, self.connectionId, self.userColor, self.userName]);
+  }, [publish, roomId, self.connectionId, self.userColor, self.userName]);
 
   return {
     remoteUsers,

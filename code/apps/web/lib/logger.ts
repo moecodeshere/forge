@@ -21,13 +21,15 @@ function formatMessage(level: LogLevel, message: string, context: LogContext = {
 
 function createLogger() {
   if (typeof window !== "undefined") {
-    // Browser: use console (no pino bundle needed)
-    return {
+    /* eslint-disable no-console -- browser: avoid bundling pino; console is the sink */
+    const browserLogger = {
       debug: (msg: string, ctx?: LogContext) => console.debug(msg, ctx),
       info: (msg: string, ctx?: LogContext) => console.info(msg, ctx),
       warn: (msg: string, ctx?: LogContext) => console.warn(msg, ctx),
       error: (msg: string, ctx?: LogContext) => console.error(msg, ctx),
     };
+    /* eslint-enable no-console */
+    return browserLogger;
   }
 
   // Server: structured JSON via process.stdout

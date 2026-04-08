@@ -61,7 +61,6 @@ export async function logSuggestionTelemetry(
     });
     if (!response.ok) {
       // Telemetry is best-effort; do not surface errors to the user.
-      // eslint-disable-next-line no-console
       console.warn("Failed to send AI suggestion telemetry");
     }
   } catch {

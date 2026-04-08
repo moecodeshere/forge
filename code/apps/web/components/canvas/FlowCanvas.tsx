@@ -384,12 +384,15 @@ function CanvasContent({ graphId }: { graphId: string }) {
     }
   }
 
-  const deleteNode = (nodeId: string) => {
-    pushHistory();
-    setNodes(nodes.filter((n) => n.id !== nodeId));
-    setEdges(edges.filter((e) => e.source !== nodeId && e.target !== nodeId));
-    if (selectedNodeId === nodeId) setSelectedNodeId(null);
-  };
+  const deleteNode = useCallback(
+    (nodeId: string) => {
+      pushHistory();
+      setNodes(nodes.filter((n) => n.id !== nodeId));
+      setEdges(edges.filter((e) => e.source !== nodeId && e.target !== nodeId));
+      if (selectedNodeId === nodeId) setSelectedNodeId(null);
+    },
+    [pushHistory, setNodes, setEdges, setSelectedNodeId, nodes, edges, selectedNodeId],
+  );
 
   async function testSelectedNode() {
     setSaveError(null);

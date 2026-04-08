@@ -6,7 +6,7 @@ import {
   FileText,
   Filter,
   Globe,
-  Image,
+  Image as ImageIcon,
   Mail,
   MousePointer,
   PauseCircle,
@@ -45,7 +45,7 @@ export function getNodeIcon(type: ForgeNodeType): React.ReactNode {
     case "web_scrape":
       return <Globe {...iconProps} />;
     case "vision_extract":
-      return <Image {...iconProps} />;
+      return <ImageIcon {...iconProps} />;
     case "sql_query":
       return <Database {...iconProps} />;
     case "loop":
