@@ -1,57 +1,30 @@
-# Dependencies
+# Same intent as ../.gitignore — patterns here apply under code/ when needed by tools.
 node_modules/
 .pnpm-store/
-
-# Next.js
-apps/web/.next/
-apps/web/out/
-
-# Build outputs
+.pnpm-debug.log*
+.next/
+out/
 dist/
 build/
-*.egg-info/
+.turbo/
+.vercel/
+*.tsbuildinfo
+.cache/
 __pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
 .mypy_cache/
 .ruff_cache/
 .pytest_cache/
-
-# Python virtualenvs
-.venv/
-venv/
-
-# Environment files
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Turbo
-.turbo/
-
-# Editors
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Test coverage
 coverage/
-*.lcov
-htmlcov/
-
-# Logs
+.env
+.env.*
+!.env.example
 *.log
-npm-debug.log*
-
-# Supabase local
-supabase/.temp/
-supabase/config.toml
-
-# Playwright
-apps/web/playwright-report/
-apps/web/test-results/
+.DS_Store
+.idea/
+.vscode/
+playwright-report/
+test-results/
